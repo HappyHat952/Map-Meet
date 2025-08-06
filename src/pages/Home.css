@@ -1,0 +1,60 @@
+.masonry-layout {
+  column-count: 4;
+  column-gap: 1em;
+  padding: 1em;
+}
+
+.widget {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  display: inline-block;
+  margin: 0 0 1em;
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  overflow: hidden; /* To keep border-radius on image */
+  break-inside: avoid;
+  transition: transform 0.2s ease-in-out;
+}
+
+.widget:hover {
+    transform: scale(1.02);
+}
+
+.widget-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.widget-content {
+  padding: 15px;
+}
+
+.widget-content h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.2em;
+}
+
+.widget-content p {
+  margin: 0 0 15px;
+  color: #555;
+}
+
+.author-info {
+  display: flex;
+  align-items: center;
+}
+
+.author-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+  object-fit: cover;
+}
+
+.author-name {
+  font-weight: bold;
+}
