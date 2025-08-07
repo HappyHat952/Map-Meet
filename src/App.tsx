@@ -4,7 +4,7 @@ import {Routes, Route, BrowserRouter} from 'react-router-dom';
 import Home from './pages/Home';
 import Map from './pages/Map';
 import Profile from './pages/Profile';
-import Project from './pages/Project';
+import ProjectDetail from './pages/ProjectDetail';
 import PageNotFound from './pages/PageNotFound';
 
 function App() {
@@ -16,7 +16,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/map" element = {<Map/>} />
         <Route path="/profile" element = {<Profile/>} />
-        <Route path="/project" element = {<Project/>} />
+        <Route path="/project/:id" element = {<ProjectDetail/>} />
         <Route path="*" element = {<PageNotFound/>} />
       </Routes>
     </BrowserRouter>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, Navigate, Link } from 'react-router-dom';
-import { Project } from '../types';
+import type { Project } from '../types';
 import './ProjectDetail.css';
 
 const ProjectDetail = () => {

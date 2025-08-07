@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Project } from '../types';
+import type { Project } from '../types';
 import './Home.css';
 
 // Helper to get random image with varying height
@@ -64,9 +64,10 @@ const generateMockProjects = (count: number): Project[] => {
   for (let i = 1; i <= count; i++) {
     const randomHeight = Math.floor(Math.random() * (700 - 200 + 1)) + 200; // Random height between 200 and 700
     const author = authors[i % authors.length];
+    const projectName = projectNames[(i - 1) % projectNames.length];
     projects.push({
       id: i,
-      name: projectNames[(i - 1) % projectNames.length],
+      name: projectName,
       description: descriptions[(i - 1) % descriptions.length],
       image: getRandomImage(i, 400, randomHeight),
       author: author.name,
@@ -84,15 +85,18 @@ function Home() {
   }, []);
 
   return (
-    <div className="masonry-layout">
-      {projects.map((project) => (
-        <Link to={`/project/${project.id}`} key={project.id} state={{ project }}>
-          <div className="widget">
-            <img src={project.image} alt={project.name} className="widget-image" />
-          </div>
-        </Link>
-      ))}
-    </div>
+    <>
+      <h1>Think Tree</h1>
+      <div className="masonry-layout">
+        {projects.map((project) => (
+          <Link to={`/project/${project.id}`} key={project.id} state={{ project }}>
+            <div className="widget">
+              <img src={project.image} alt={project.name} className="widget-image" />
+            </div>
+          </Link>
+        ))}
+      </div>
+    </>
   );
 }
 
