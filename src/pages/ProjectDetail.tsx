@@ -8,6 +8,8 @@ const ProjectDetail = () => {
   const project = location.state?.project as Project | undefined;
   const [comments, setComments] = useState<string[]>([]);
   const [newComment, setNewComment] = useState('');
+  const [likes, setLikes] = useState(0);
+  const [liked, setLiked] = useState(false);
 
   if (!project) {
     // If no project data is passed in state (e.g., direct URL access),
@@ -41,10 +43,34 @@ const ProjectDetail = () => {
                 />
               </div>
               <div className="image-actions">
-                <button className="image-action-button like-button">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="m8 2.748-.717-.737C5.6.271 2.5 1.755 2.5 4.723c0 1.524.608 2.84 1.561 3.878A12.9 12.9 0 0 0 8 13.593a12.9 12.9 0 0 0 3.939-4.992c.953-1.038 1.56-2.354 1.56-3.878 0-2.968-3.1-4.452-4.783-2.708L8 2.748z"/>
-                  </svg>
+                <button
+                  className={`modern-like-button${liked ? ' liked' : ''}`}
+                  onClick={() => {
+                    if (!liked) {
+                      setLikes(likes + 1);
+                      setLiked(true);
+                    } else {
+                      setLikes(likes - 1);
+                      setLiked(false);
+                    }
+                  }}
+                  aria-label={liked ? "Unlike" : "Like"}
+                  type="button"
+                >
+                  <span className="like-icon">
+                    {liked ? (
+                      // Filled heart
+                      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="#e0245e" viewBox="0 0 24 24">
+                        <path d="M12.1 8.64l-.1.1-.11-.11C10.14 6.6 7.1 7.24 7.1 9.91c0 1.54 1.23 3.04 3.55 5.36l1.35 1.32 1.35-1.32c2.32-2.32 3.55-3.82 3.55-5.36 0-2.67-3.04-3.31-4.9-1.27z"/>
+                      </svg>
+                    ) : (
+                      // Outline heart
+                      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="none" stroke="#e0245e" strokeWidth="2" viewBox="0 0 24 24">
+                        <path d="M12.1 8.64l-.1.1-.11-.11C10.14 6.6 7.1 7.24 7.1 9.91c0 1.54 1.23 3.04 3.55 5.36l1.35 1.32 1.35-1.32c2.32-2.32 3.55-3.82 3.55-5.36 0-2.67-3.04-3.31-4.9-1.27z"/>
+                      </svg>
+                    )}
+                  </span>
+                  <span className="like-badge">{likes}</span>
                 </button>
               </div>
             </div>
