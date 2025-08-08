@@ -27,9 +27,16 @@
   transition: transform 0.3s ease;
 }
 
-.image-container {
+.image-section {
   position: relative;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.image-container {
+  width: 100%;
+  flex: 1;
 }
 
 .project-detail-image {
@@ -44,6 +51,7 @@
   right: 1rem;
   display: flex;
   gap: 0.5rem;
+  z-index: 10;
 }
 
 .image-action-button {
@@ -210,14 +218,20 @@
 @media (min-width: 768px) {
   .project-detail-card {
     flex-direction: row;
+    align-items: stretch;
   }
 
   .project-detail-card.no-image .project-detail-content {
     width: 100%;
   }
 
-  .project-detail-image {
+  .image-section {
     width: 50%;
+    position: relative;
+  }
+
+  .project-detail-image {
+    width: 100%;
     object-fit: cover;
     height: 400px;
   }
@@ -225,5 +239,11 @@
   .project-detail-content {
     width: 50%;
     padding: 2rem;
+  }
+
+  .image-actions {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
   }
 }

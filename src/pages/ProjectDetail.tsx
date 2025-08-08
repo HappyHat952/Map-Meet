@@ -31,12 +31,14 @@ const ProjectDetail = () => {
       </Link>
       <div className={`project-detail-card ${!project.image ? 'no-image' : ''}`}>
         {project.image && (
-          <div className="image-container">
-            <img
-              src={project.image}
-              alt={project.name}
-              className="project-detail-image"
-            />
+          <div className="image-section">
+            <div className="image-container">
+              <img
+                src={project.image}
+                alt={project.name}
+                className="project-detail-image"
+              />
+            </div>
             <div className="image-actions">
               <button className="image-action-button like-button">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
