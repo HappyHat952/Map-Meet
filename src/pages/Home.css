@@ -1,0 +1,161 @@
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #fff;
+  margin-bottom: 1rem;
+}
+
+.home-header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.header-button {
+  padding: 0.6rem 1.2rem;
+  border: 1px solid transparent;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.create-button {
+  background-color: #007bff;
+  color: white;
+}
+
+.create-button:hover {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+}
+
+.notifications-button {
+  background-color: #f0f2f5;
+  color: #333;
+}
+
+.notifications-button:hover {
+  background-color: #e2e6ea;
+}
+
+.login-button {
+  background-color: #fff;
+  color: #007bff;
+  border-color: #007bff;
+}
+
+.login-button:hover {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.home-intro {
+  text-align: center;
+  padding: 0 1rem 1rem;
+  color: #555;
+}
+
+.masonry-layout {
+  column-count: 4;
+  column-gap: 1em;
+  padding: 1em;
+}
+
+.widget {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  display: inline-block;
+  margin: 0 0 1em;
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  overflow: hidden; /* To keep border-radius on image */
+  break-inside: avoid;
+  transition: transform 0.2s ease-in-out;
+  position: relative; /* For positioning the overlay */
+}
+
+.widget:hover {
+    transform: scale(1.02);
+}
+
+.widget-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.widget .widget-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6); /* Dark and translucent */
+  color: white;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.widget:hover .widget-overlay {
+  opacity: 1;
+}
+
+.widget-overlay h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.4em;
+  font-weight: bold;
+}
+
+.widget-overlay p {
+  margin: 0;
+  font-size: 0.9em;
+}
+
+.widget-content {
+  padding: 15px;
+}
+
+.widget-content h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.2em;
+}
+
+.widget-content p {
+  margin: 0 0 15px;
+  color: #555;
+}
+
+.author-info {
+  display: flex;
+  align-items: center;
+}
+
+.author-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+  object-fit: cover;
+}
+
+.author-name {
+  font-weight: bold;
+}
