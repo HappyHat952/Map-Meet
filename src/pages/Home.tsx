@@ -3,13 +3,17 @@ import { Link } from 'react-router-dom';
 import type { Project } from '../types';
 import './Home.css';
 
-// Helper to get random image with varying height
-// Using the /id/{id} endpoint for more reliable image loading
-const getRandomImage = (id: number, width: number, height: number) => `https://picsum.photos/id/${id}/${width}/${height}`;
-
 // Mock data generation
 const generateMockProjects = (count: number): Project[] => {
   const projects: Project[] = [];
+  const imageUrls = [
+    'https://images.unsplash.com/photo-1494253109108-2e30c049369b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1485550409059-9afb054cada4?q=80&w=765&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://plus.unsplash.com/premium_photo-1670590785994-ab5e8a2ccd61?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fHJhbmRvbXxlbnwwfHwwfHx8MA%3D%3D',
+    'https://images.unsplash.com/photo-1613336026275-d6d473084e85?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDB8fHJhbmRvbXxlbnwwfHwwfHx8MA%3D%3D',
+    'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzJ8fHJhbmRvbXxlbnwwfHwwfHx8MA%3D%3D'
+  ];
   const authors = [
     { name: 'Sarah Chen', avatar: 'https://i.pravatar.cc/150?img=1' },
     { name: 'David Lee', avatar: 'https://i.pravatar.cc/150?img=2' },
@@ -61,15 +65,19 @@ const generateMockProjects = (count: number): Project[] => {
       'A platform for freelancers to find and manage their next gig.'
   ];
 
+  const descriptionOnlyWidgets = [4, 9, 14]; // IDs of widgets that will only show description
+
   for (let i = 1; i <= count; i++) {
-    const randomHeight = Math.floor(Math.random() * (700 - 200 + 1)) + 200; // Random height between 200 and 700
     const author = authors[i % authors.length];
     const projectName = projectNames[(i - 1) % projectNames.length];
+    const hasImage = !descriptionOnlyWidgets.includes(i);
+    const imageUrl = imageUrls[(i - 1) % imageUrls.length];
+
     projects.push({
       id: i,
       name: projectName,
       description: descriptions[(i - 1) % descriptions.length],
-      image: getRandomImage(i, 400, randomHeight),
+      image: hasImage ? imageUrl : '',
       author: author.name,
       authorAvatar: author.avatar,
     });
@@ -86,12 +94,36 @@ function Home() {
 
   return (
     <>
-      <h1>Think Tree</h1>
+      <header className="home-header">
+        <h1>Think Tree</h1>
+        <div className="header-actions">
+          <button className="header-button create-button">Create</button>
+          <button className="header-button notifications-button">Notifications</button>
+          <button className="header-button login-button">Login</button>
+        </div>
+      </header>
+      <div className="home-intro">
+        <p>Explore innovative projects and connect with their creators.</p>
+        <p>Click on a project to learn more.</p>
+      </div>
       <div className="masonry-layout">
         {projects.map((project) => (
           <Link to={`/project/${project.id}`} key={project.id} state={{ project }}>
             <div className="widget">
-              <img src={project.image} alt={project.name} className="widget-image" />
+              {project.image ? (
+                <>
+                  <img src={project.image} alt={project.name} className="widget-image" />
+                  <div className="widget-overlay">
+                    <h3>{project.name}</h3>
+                    <p>{project.description}</p>
+                  </div>
+                </>
+              ) : (
+                <div className="widget-content">
+                  <h3>{project.name}</h3>
+                  <p>{project.description}</p>
+                </div>
+              )}
             </div>
           </Link>
         ))}

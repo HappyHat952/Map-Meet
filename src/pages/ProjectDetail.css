@@ -74,6 +74,10 @@
     flex-direction: row;
   }
 
+  .project-detail-card.no-image .project-detail-content {
+    width: 100%;
+  }
+
   .project-detail-image {
     width: 50%;
     object-fit: cover;
