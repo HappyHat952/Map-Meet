@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import type { Project } from '../types';
 import './Home.css';
+import { signInWithGoogleAndSaveProfile, auth } from '../firebase';
+import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
 
 // Mock data generation
 const generateMockProjects = (count: number): Project[] => {
@@ -87,10 +89,33 @@ const generateMockProjects = (count: number): Project[] => {
 
 function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   useEffect(() => {
     setProjects(generateMockProjects(20));
   }, []);
+
+  // Listen for auth state changes
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    });
+    return unsubscribe;
+  }, []);
+
+  const handleLogin = async () => {
+    try {
+      const user = await signInWithGoogleAndSaveProfile();
+      alert(`Welcome, ${user.displayName}!`);
+    } catch (e) {
+      alert("Login failed.");
+    }
+  };
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    setCurrentUser(null);
+  };
 
   return (
     <>
@@ -99,7 +124,14 @@ function Home() {
         <div className="header-actions">
           <button className="header-button create-button">Create</button>
           <button className="header-button notifications-button">Notifications</button>
-          <button className="header-button login-button">Login</button>
+          {!currentUser ? (
+            <button className="header-button login-button" onClick={handleLogin}>Login</button>
+          ) : (
+            <>
+              <span className="welcome-message">Welcome, {currentUser.displayName}</span>
+              <button className="header-button logout-button" onClick={handleLogout}>Logout</button>
+            </>
+          )}
         </div>
       </header>
       <div className="home-intro">

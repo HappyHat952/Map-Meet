@@ -2,14 +2,27 @@ import React, { useState } from 'react';
 import { useLocation, Navigate, Link } from 'react-router-dom';
 import type { Project } from '../types';
 import './ProjectDetail.css';
+import { auth } from '../firebase'; // Make sure you export 'auth' from your firebase.js
+import { onAuthStateChanged } from "firebase/auth";
+import type { User } from "firebase/auth";
 
 const ProjectDetail = () => {
   const location = useLocation();
   const project = location.state?.project as Project | undefined;
-  const [comments, setComments] = useState<string[]>([]);
+  // Change comments to store user info
+  const [comments, setComments] = useState<{ text: string, author: string, photoURL: string }[]>([]);
   const [newComment, setNewComment] = useState('');
   const [likes, setLikes] = useState(0);
   const [liked, setLiked] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+  // Listen for auth state changes
+  React.useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    });
+    return unsubscribe;
+  }, []);
 
   if (!project) {
     // If no project data is passed in state (e.g., direct URL access),
@@ -19,8 +32,15 @@ const ProjectDetail = () => {
 
   const handleCommentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (newComment.trim()) {
-      setComments([...comments, newComment.trim()]);
+    if (newComment.trim() && currentUser) {
+      setComments([
+        ...comments,
+        {
+          text: newComment.trim(),
+          author: currentUser.displayName || "User",
+          photoURL: currentUser.photoURL || "https://i.pravatar.cc/150?img=21"
+        }
+      ]);
       setNewComment('');
     }
   };
@@ -112,10 +132,11 @@ const ProjectDetail = () => {
                 type="text"
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Add a comment..."
+                placeholder={currentUser ? "Add a comment..." : "Login to comment"}
                 className="compact-comment-input"
+                disabled={!currentUser}
               />
-              <button type="submit" className="compact-submit-button">
+              <button type="submit" className="compact-submit-button" disabled={!currentUser}>
                 Post
               </button>
             </form>
@@ -125,10 +146,10 @@ const ProjectDetail = () => {
               ) : (
                 comments.slice(0, 3).map((comment, index) => (
                   <div key={index} className="compact-comment-item">
-                    <img src="https://i.pravatar.cc/150?img=21" alt="User" className="compact-comment-avatar" />
+                    <img src={comment.photoURL} alt={comment.author} className="compact-comment-avatar" />
                     <div className="compact-comment-content">
-                      <span className="compact-comment-author">User</span>
-                      <p className="compact-comment-text">{comment}</p>
+                      <span className="compact-comment-author">{comment.author}</span>
+                      <p className="compact-comment-text">{comment.text}</p>
                     </div>
                   </div>
                 ))
