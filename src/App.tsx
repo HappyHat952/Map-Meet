@@ -6,6 +6,7 @@ import Map from './pages/Map';
 import Profile from './pages/Profile';
 import ProjectDetail from './pages/ProjectDetail';
 import PageNotFound from './pages/PageNotFound';
+import CreateProject from './pages/CreateProject';
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
         <Route path="/profile" element = {<Profile/>} />
         <Route path="/project/:id" element = {<ProjectDetail/>} />
         <Route path="*" element = {<PageNotFound/>} />
+        <Route path="/create" element={<CreateProject />} />
       </Routes>
     </BrowserRouter>
     </>

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { Project } from '../types';
 import './Home.css';
-import { signInWithGoogleAndSaveProfile, auth } from '../firebase';
+import { signInWithGoogleAndSaveProfile, auth, db } from '../firebase';
 import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
+import { collection, query, where, onSnapshot, updateDoc, doc } from "firebase/firestore";
 
 // Mock data generation
 const generateMockProjects = (count: number): Project[] => {
@@ -88,12 +89,12 @@ const generateMockProjects = (count: number): Project[] => {
 };
 
 function Home() {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [mockProjects] = useState<Project[]>(generateMockProjects(20));
+  const [firestoreProjects, setFirestoreProjects] = useState<Project[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    setProjects(generateMockProjects(20));
-  }, []);
+  const [invites, setInvites] = useState<any[]>([]);
+  const [showInvitePopup, setShowInvitePopup] = useState(false);
+  const navigate = useNavigate();
 
   // Listen for auth state changes
   useEffect(() => {
@@ -101,6 +102,27 @@ function Home() {
       setCurrentUser(user);
     });
     return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    const q = query(
+      collection(db, "invites"),
+      where("toUserId", "==", currentUser.uid),
+      where("status", "==", "pending")
+    );
+    const unsub = onSnapshot(q, (snap) => {
+      setInvites(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+    return unsub;
+  }, [currentUser]);
+
+  // Only fetch Firestore projects here
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, "projects"), (snap) => {
+      setFirestoreProjects(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+    return unsub;
   }, []);
 
   const handleLogin = async () => {
@@ -117,29 +139,43 @@ function Home() {
     setCurrentUser(null);
   };
 
+  // Combine mock and Firestore projects
+  const allProjects = [...firestoreProjects, ...mockProjects];
+
   return (
     <>
       <header className="home-header">
         <h1>Think Tree</h1>
         <div className="header-actions">
-          <button className="header-button create-button">Create</button>
-          <button className="header-button notifications-button">Notifications</button>
+          <button className="header-button create-button" onClick={() => navigate('/create')}>Create</button>
+          <button className="header-button notifications-button" onClick={() => setShowInvitePopup(true)}>
+            Notifications
+            {invites.length > 0 && (
+              <img
+                src={invites[0].fromUser.photoURL}
+                alt={invites[0].fromUser.displayName}
+                style={{ width: 24, height: 24, borderRadius: "50%", marginLeft: 8 }}
+              />
+            )}
+          </button>
           {!currentUser ? (
             <button className="header-button login-button" onClick={handleLogin}>Login</button>
           ) : (
-            <>
-              <span className="welcome-message">Welcome, {currentUser.displayName}</span>
-              <button className="header-button logout-button" onClick={handleLogout}>Logout</button>
-            </>
+            <button className="header-button logout-button" onClick={handleLogout}>Logout</button>
           )}
         </div>
       </header>
       <div className="home-intro">
+        {currentUser && (
+          <div className="welcome-message" style={{ marginBottom: 16 }}>
+            Welcome, {currentUser.displayName}!
+          </div>
+        )}
         <p>Explore innovative projects and connect with their creators.</p>
         <p>Click on a project to learn more.</p>
       </div>
       <div className="masonry-layout">
-        {projects.map((project) => (
+        {allProjects.map((project) => (
           <Link to={`/project/${project.id}`} key={project.id} state={{ project }}>
             <div className="widget">
               {project.image ? (
@@ -160,6 +196,30 @@ function Home() {
           </Link>
         ))}
       </div>
+      {showInvitePopup && (
+        <div className="invite-popup">
+          <h4>Collaboration Requests</h4>
+          {invites.length === 0 ? (
+            <p>No requests</p>
+          ) : (
+            invites.map(invite => (
+              <div key={invite.id} className="invite-item">
+                <img src={invite.fromUser.photoURL} alt={invite.fromUser.displayName} style={{ width: 32, borderRadius: "50%" }} />
+                <span>{invite.fromUser.displayName} wants to collaborate!</span>
+                <button onClick={async () => {
+                  // Accept: update Firestore
+                  await updateDoc(doc(db, "invites", invite.id), { status: "accepted" });
+                }}>Accept</button>
+                <button onClick={async () => {
+                  // Deny: update Firestore
+                  await updateDoc(doc(db, "invites", invite.id), { status: "denied" });
+                }}>Deny</button>
+              </div>
+            ))
+          )}
+          <button onClick={() => setShowInvitePopup(false)}>Close</button>
+        </div>
+      )}
     </>
   );
 }

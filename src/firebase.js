@@ -70,4 +70,15 @@ export async function signInWithGoogleAndSaveProfile() {
   }
 }
 
+export async function sendInviteRequest(projectId, toUserId, fromUser) {
+  // fromUser: { uid, displayName, photoURL }
+  return addDoc(collection(db, "invites"), {
+    projectId,
+    toUserId,
+    fromUser,
+    status: "pending",
+    createdAt: Date.now(),
+  });
+}
+
 export { db, app, analytics, auth };
