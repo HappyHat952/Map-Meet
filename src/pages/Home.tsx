@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import type { Project } from '../types';
 import './Home.css';
@@ -99,6 +99,8 @@ function Home() {
   const [showInvitePopup, setShowInvitePopup] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [requests, setRequests] = useState<Request[]>([]); // Fetch from Firestore
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   // Listen for auth state changes
@@ -179,6 +181,21 @@ function Home() {
   // Combine mock and Firestore projects
   const allProjects = [...firestoreProjects, ...mockProjects];
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setProfileDropdownOpen(false);
+      }
+    }
+    if (profileDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [profileDropdownOpen]);
+
   return (
     <>
       <header className="home-header">
@@ -196,7 +213,45 @@ function Home() {
           {!currentUser ? (
             <button className="header-button login-button" onClick={handleLogin}>Login</button>
           ) : (
-            <button className="header-button logout-button" onClick={handleLogout}>Logout</button>
+            <div className="profile-dropdown-container" ref={profileRef} style={{ position: "relative" }}>
+              <img
+                src={currentUser.photoURL}
+                alt={currentUser.displayName || "Profile"}
+                className="profile-icon"
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  marginRight: 0,
+                  verticalAlign: "middle",
+                  cursor: "pointer"
+                }}
+                onClick={() => setProfileDropdownOpen((open) => !open)}
+              />
+              {profileDropdownOpen && (
+                <div className="profile-dropdown-menu">
+                  <button
+                    className="profile-dropdown-item"
+                    onClick={() => {
+                      setProfileDropdownOpen(false);
+                      navigate("/profile");
+                    }}
+                  >
+                    View Profile
+                  </button>
+                  <button
+                    className="profile-dropdown-item"
+                    onClick={() => {
+                      setProfileDropdownOpen(false);
+                      handleLogout();
+                    }}
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </header>
