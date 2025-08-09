@@ -4,7 +4,8 @@ import type { Project } from '../types';
 import './Home.css';
 import { signInWithGoogleAndSaveProfile, auth, db } from '../firebase';
 import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
-import { collection, query, where, onSnapshot, updateDoc, doc } from "firebase/firestore";
+import { collection, query, where, onSnapshot, updateDoc, doc, getDocs } from "firebase/firestore";
+import NotificationModal from './NotificationModal';
 
 
 
@@ -42,32 +43,32 @@ const generateMockProjects = (count: number): Project[] => {
     { name: 'Thomas Flores', avatar: 'https://i.pravatar.cc/150?img=20' },
   ];
   const projectNames = [
-    'WeFit', 'Artify', 'CodeConnect', 'EcoTrack', 'FoodieFinds', 
-    'TravelBuddy', 'MusicVerse', 'HealthHub', 'LearnLink', 'PetPal', 
+    'WeFit', 'Artify', 'CodeConnect', 'EcoTrack', 'FoodieFinds',
+    'TravelBuddy', 'MusicVerse', 'HealthHub', 'LearnLink', 'PetPal',
     'HomeDecor', 'AutoFix', 'GameOn', 'StyleSwap', 'BookNook',
     'CityQuest', 'MindWell', 'SpaceExplorer', 'RecipeGenius', 'GigFinder'
   ];
   const descriptions = [
-      'A fitness app that helps users track their workouts and nutrition.',
-      'An AI-powered platform for creating and sharing digital art.',
-      'A social network for developers to collaborate on projects.',
-      'An app for tracking your carbon footprint and promoting sustainable habits.',
-      'Discover and share hidden gem restaurants and recipes.',
-      'Connect with fellow travelers and plan your next adventure.',
-      'A universe of music to explore, create playlists, and discover new artists.',
-      'Your personal health assistant for monitoring symptoms and finding care.',
-      'An online learning platform with courses from top instructors.',
-      'Everything you need for your furry friends, from food to fun.',
-      'Inspiration and tools for your next home renovation project.',
-      'Connect with trusted mechanics for your car maintenance needs.',
-      'A community for gamers to find teammates and compete.',
-      'A marketplace for trading and selling pre-loved fashion.',
-      'A cozy corner of the internet for book lovers to discuss their favorite reads.',
-      'Explore your city and uncover hidden gems with interactive challenges.',
-      'A mental wellness app providing meditation and mindfulness exercises.',
-      'Journey through the cosmos with this educational space exploration app.',
-      'Generate unique recipes based on the ingredients you have at home.',
-      'A platform for freelancers to find and manage their next gig.'
+    'A fitness app that helps users track their workouts and nutrition.',
+    'An AI-powered platform for creating and sharing digital art.',
+    'A social network for developers to collaborate on projects.',
+    'An app for tracking your carbon footprint and promoting sustainable habits.',
+    'Discover and share hidden gem restaurants and recipes.',
+    'Connect with fellow travelers and plan your next adventure.',
+    'A universe of music to explore, create playlists, and discover new artists.',
+    'Your personal health assistant for monitoring symptoms and finding care.',
+    'An online learning platform with courses from top instructors.',
+    'Everything you need for your furry friends, from food to fun.',
+    'Inspiration and tools for your next home renovation project.',
+    'Connect with trusted mechanics for your car maintenance needs.',
+    'A community for gamers to find teammates and compete.',
+    'A marketplace for trading and selling pre-loved fashion.',
+    'A cozy corner of the internet for book lovers to discuss their favorite reads.',
+    'Explore your city and uncover hidden gems with interactive challenges.',
+    'A mental wellness app providing meditation and mindfulness exercises.',
+    'Journey through the cosmos with this educational space exploration app.',
+    'Generate unique recipes based on the ingredients you have at home.',
+    'A platform for freelancers to find and manage their next gig.'
   ];
 
   const descriptionOnlyWidgets = [4, 9, 14]; // IDs of widgets that will only show description
@@ -96,6 +97,8 @@ function Home() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [invites, setInvites] = useState<any[]>([]);
   const [showInvitePopup, setShowInvitePopup] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [requests, setRequests] = useState<Request[]>([]); // Fetch from Firestore
   const navigate = useNavigate();
 
   // Listen for auth state changes
@@ -130,6 +133,21 @@ function Home() {
     return unsub;
   }, []);
 
+  // Fetch requests from Firestore and setRequests on mount
+  useEffect(() => {
+    const fetchRequests = async () => {
+      if (!currentUser) return;
+      const q = query(
+        collection(db, "Invites"),
+        where("toUserId", "==", currentUser.uid),
+        where("status", "==", "pending")
+      );
+      const snap = await getDocs(q);
+      setRequests(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    };
+    fetchRequests();
+  }, [currentUser]);
+
   const handleLogin = async () => {
     try {
       const user = await signInWithGoogleAndSaveProfile();
@@ -144,6 +162,20 @@ function Home() {
     setCurrentUser(null);
   };
 
+  const handleAccept = async (id: string) => {
+    // Update Firestore to accept
+    await updateDoc(doc(db, "Invites", id), { status: "accepted" });
+    // Remove from requests list
+    setRequests(reqs => reqs.filter(r => r.id !== id));
+  };
+
+  const handleReject = async (id: string) => {
+    // Update Firestore to reject
+    await updateDoc(doc(db, "Invites", id), { status: "denied" });
+    // Remove from requests list
+    setRequests(reqs => reqs.filter(r => r.id !== id));
+  };
+
   // Combine mock and Firestore projects
   const allProjects = [...firestoreProjects, ...mockProjects];
 
@@ -153,16 +185,14 @@ function Home() {
         <h1>Think Tree</h1>
         <div className="header-actions">
           <button className="header-button create-button" onClick={() => navigate('/create')}>Create</button>
-          <button className="header-button notifications-button" onClick={() => setShowInvitePopup(true)}>
-            Notifications
-            {invites.length > 0 && (
-              <img
-                src={invites[0].fromUser.photoURL}
-                alt={invites[0].fromUser.displayName}
-                style={{ width: 24, height: 24, borderRadius: "50%", marginLeft: 8 }}
-              />
-            )}
-          </button>
+          <button onClick={() => setModalOpen(true)}>🔔 Notifications</button>
+          <NotificationModal
+            open={modalOpen}
+            onClose={() => setModalOpen(false)}
+            requests={requests}
+            onAccept={handleAccept}
+            onReject={handleReject}
+          />
           {!currentUser ? (
             <button className="header-button login-button" onClick={handleLogin}>Login</button>
           ) : (
@@ -225,6 +255,7 @@ function Home() {
           <button onClick={() => setShowInvitePopup(false)}>Close</button>
         </div>
       )}
+
     </>
   );
 }
