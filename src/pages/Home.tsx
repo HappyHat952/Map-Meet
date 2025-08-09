@@ -6,6 +6,8 @@ import { signInWithGoogleAndSaveProfile, auth, db } from '../firebase';
 import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
 import { collection, query, where, onSnapshot, updateDoc, doc } from "firebase/firestore";
 
+
+
 // Mock data generation
 const generateMockProjects = (count: number): Project[] => {
   const projects: Project[] = [];
@@ -105,9 +107,12 @@ function Home() {
   }, []);
 
   useEffect(() => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      setInvites([]); // Clear invites when logged out
+      return;         // Don't set up Firestore listener
+    }
     const q = query(
-      collection(db, "invites"),
+      collection(db, "Invites"),
       where("toUserId", "==", currentUser.uid),
       where("status", "==", "pending")
     );
@@ -119,7 +124,7 @@ function Home() {
 
   // Only fetch Firestore projects here
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "projects"), (snap) => {
+    const unsub = onSnapshot(collection(db, "Projects"), (snap) => {
       setFirestoreProjects(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
     return unsub;
@@ -208,11 +213,11 @@ function Home() {
                 <span>{invite.fromUser.displayName} wants to collaborate!</span>
                 <button onClick={async () => {
                   // Accept: update Firestore
-                  await updateDoc(doc(db, "invites", invite.id), { status: "accepted" });
+                  await updateDoc(doc(db, "Invites", invite.id), { status: "accepted" });
                 }}>Accept</button>
                 <button onClick={async () => {
                   // Deny: update Firestore
-                  await updateDoc(doc(db, "invites", invite.id), { status: "denied" });
+                  await updateDoc(doc(db, "Invites", invite.id), { status: "denied" });
                 }}>Deny</button>
               </div>
             ))

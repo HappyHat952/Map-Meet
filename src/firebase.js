@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore, collection, addDoc, getDocs } from "firebase/firestore";
+import { getFirestore, collection, addDoc, getDocs, setDoc, doc } from "firebase/firestore";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -56,8 +56,8 @@ export async function signInWithGoogleAndSaveProfile() {
   try {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
-    // Save user profile to Firestore
-    await saveData("users", {
+    // Save user profile to Firestore with UID as document ID
+    await setDoc(doc(db, "Users", user.uid), {
       uid: user.uid,
       name: user.displayName,
       email: user.email,
@@ -72,7 +72,7 @@ export async function signInWithGoogleAndSaveProfile() {
 
 export async function sendInviteRequest(projectId, toUserId, fromUser) {
   // fromUser: { uid, displayName, photoURL }
-  return addDoc(collection(db, "invites"), {
+  return addDoc(collection(db, "Invites"), {
     projectId,
     toUserId,
     fromUser,

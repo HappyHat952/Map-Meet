@@ -20,7 +20,7 @@ const CreateProject = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name || !description || !currentUser) return;
-    await addDoc(collection(db, 'projects'), {
+    await addDoc(collection(db, 'Projects'), {
       name,
       description,
       image,
