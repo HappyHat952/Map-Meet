@@ -1,0 +1,108 @@
+.create-project-page {
+  max-width: 400px;
+  min-width: 320px;
+  width: 92vw;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  padding: 48px 56px 40px 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+@media (max-width: 900px) {
+  .create-project-page {
+    max-width: 98vw;
+    padding: 24px 2vw;
+  }
+}
+
+@media (max-width: 600px) {
+  .create-project-page {
+    max-width: 100vw;
+    padding: 10px 2vw;
+  }
+  .create-project-form label {
+    font-size: 0.98rem;
+  }
+  .create-project-page h2 {
+    font-size: 1.3rem;
+  }
+}
+}
+.create-project-page h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #2d3748;
+  font-size: 2rem;
+}
+.create-project-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.create-project-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+  color: #4a5568;
+  font-size: 1rem;
+  gap: 6px;
+}
+.create-project-form input[type="text"],
+.create-project-form textarea {
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 1rem;
+  background: #f7fafc;
+  transition: border 0.2s;
+}
+.create-project-form input[type="text"]:focus,
+.create-project-form textarea:focus {
+  border: 1.5px solid #3182ce;
+  outline: none;
+}
+.create-project-form textarea {
+  min-height: 70px;
+  resize: vertical;
+}
+.create-project-form input[type="file"] {
+  margin-top: 4px;
+}
+.create-project-form button[type="submit"] {
+  background: linear-gradient(90deg, #3182ce 60%, #63b3ed 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(49,130,206,0.08);
+}
+.create-project-form button[type="submit"]:hover:not(:disabled) {
+  background: linear-gradient(90deg, #2563eb 60%, #4299e1 100%);
+}
+.create-project-form button[type="submit"]:disabled {
+  background: #cbd5e1;
+  color: #718096;
+  cursor: not-allowed;
+}
+.create-project-page > button[type="button"] {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: #3182ce;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-bottom: 12px;
+  padding: 0;
+  transition: color 0.2s;
+}
+.create-project-page > button[type="button"]:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
