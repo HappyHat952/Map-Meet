@@ -1,3 +1,28 @@
+
+.welcome-message {
+  margin-bottom: 16px;
+  font-weight: 700;
+  font-size: 22px;
+  border-radius: 18px;
+  background: #f7f7fa;
+  padding: 10px 24px;
+  display: inline-block;
+  color: #222;
+  letter-spacing: 0.2px;
+}
+
+.home-description.custom-desc {
+  font-style: italic;
+  font-size: 18px;
+  color: #577a48;
+  background: none;
+  padding: 0;
+  margin: 0 0 1.5rem 0;
+  text-align: left;
+  display: block;
+  border-radius: 0;
+  letter-spacing: 0.1px;
+}
 .home-header {
   display: flex;
   justify-content: space-between;
@@ -8,9 +33,15 @@
   margin-bottom: 1rem;
 }
 
-.home-header h1 {
+.home-header h1, .thinktree-title {
   margin: 0;
-  font-size: 1.8rem;
+  font-size: 2.5rem;
+  font-family: 'Lilita One', cursive;
+  letter-spacing: 1px;
+}
+
+.thinktree-title {
+  color: #577a48;
 }
 
 .header-actions {
@@ -34,12 +65,12 @@
 }
 
 .create-button {
-  background-color: #007bff;
+  background-color: #577a48;
   color: white;
 }
 
 .create-button:hover {
-  background-color: #0056b3;
+  background-color: #577a48;
   transform: translateY(-1px);
 }
 
@@ -54,12 +85,12 @@
 
 .login-button {
   background-color: #fff;
-  color: #007bff;
-  border-color: #007bff;
+  color: #577a48;
+  border-color: #577a48;
 }
 
 .login-button:hover {
-  background-color: #007bff;
+  background-color: #577a48;
   color: #fff;
 }
 
@@ -141,6 +172,7 @@
   margin-top: 0;
   margin-bottom: 10px;
   font-size: 1.2em;
+  color: #577a48;
 }
 
 .widget-content p {

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import type { Project } from '../types';
 import './Home.css';
+
 import { signInWithGoogleAndSaveProfile, auth, db } from '../firebase';
 import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
 import { collection, query, where, onSnapshot, updateDoc, doc, getDocs } from "firebase/firestore";
@@ -199,10 +200,10 @@ function Home() {
   return (
     <>
       <header className="home-header">
-        <h1>Think Tree</h1>
+  <h1 className="thinktree-title">ThinkTree.</h1>
         <div className="header-actions">
           <button className="header-button create-button" onClick={() => navigate('/create')}>Create</button>
-          <button onClick={() => setModalOpen(true)}>🔔 Notifications</button>
+          <button onClick={() => setModalOpen(true)}>Notifications</button>
           <NotificationModal
             open={modalOpen}
             onClose={() => setModalOpen(false)}
@@ -256,13 +257,9 @@ function Home() {
         </div>
       </header>
       <div className="home-intro">
-        {currentUser && (
-          <div className="welcome-message" style={{ marginBottom: 16 }}>
-            Welcome, {currentUser.displayName}!
-          </div>
-        )}
-        <p>Explore innovative projects and connect with their creators.</p>
-        <p>Click on a project to learn more.</p>
+        <p className="home-description custom-desc">
+          Explore ideas and connect with their creators. Click on a project to learn more.
+        </p>
       </div>
       <div className="masonry-layout">
         {allProjects.map((project) => (
