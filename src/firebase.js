@@ -81,4 +81,13 @@ export async function sendInviteRequest(projectId, toUserId, fromUser) {
   });
 }
 
+// Add a comment to Firestore for a specific project
+export async function addCommentToProject(projectId, comment) {
+  // comment: { text, author, photoURL, timestamp }
+  return await addDoc(collection(db, "Comments"), {
+    projectId,
+    ...comment,
+  });
+}
+
 export { db, app, analytics, auth };

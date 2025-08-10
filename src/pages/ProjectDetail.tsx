@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useLocation, Navigate, Link } from 'react-router-dom';
 import type { Project } from '../types';
 import './ProjectDetail.css';
-import { auth, sendInviteRequest } from '../firebase'; // Make sure you export 'auth' from your firebase.js
+import { auth, sendInviteRequest, addCommentToProject } from '../firebase'; // Make sure export 'auth' from firebase.js
+import { getFirestore, collection, query, where, getDocs, orderBy } from 'firebase/firestore';
 import { onAuthStateChanged } from "firebase/auth";
 import type { User } from "firebase/auth";
 
@@ -10,7 +11,29 @@ const ProjectDetail = () => {
   const location = useLocation();
   const project = location.state?.project as Project | undefined;
   // Change comments to store user info
-  const [comments, setComments] = useState<{ text: string, author: string, photoURL: string }[]>([]);
+  const [comments, setComments] = useState<{ text: string, author: string, photoURL: string, timestamp?: number }[]>([]);
+  // Fetch comments from Firestore for this project
+  React.useEffect(() => {
+    if (!project) return;
+    const fetchComments = async () => {
+      try {
+        const db = getFirestore();
+        const q = query(
+          collection(db, 'Comments'),
+          where('projectId', '==', project.id),
+          orderBy('timestamp', 'desc')
+        );
+        const querySnapshot = await getDocs(q);
+        const fetchedComments = querySnapshot.docs.map(doc => ({
+          ...doc.data(),
+        })) as { text: string, author: string, photoURL: string, timestamp?: number }[];
+        setComments(fetchedComments);
+      } catch (err) {
+        console.error('Error fetching comments:', err);
+      }
+    };
+    fetchComments();
+  }, [project]);
   const [newComment, setNewComment] = useState('');
   const [likes, setLikes] = useState(0);
   const [liked, setLiked] = useState(false);
@@ -25,23 +48,27 @@ const ProjectDetail = () => {
   }, []);
 
   if (!project) {
-    // If no project data is passed in state (e.g., direct URL access),
+    // If no project data is passed in state
     // redirect to the home page as a fallback.
     return <Navigate to="/" replace />;
   }
 
-  const handleCommentSubmit = (e: React.FormEvent) => {
+  const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newComment.trim() && currentUser) {
-      setComments([
-        ...comments,
-        {
-          text: newComment.trim(),
-          author: currentUser.displayName || "User",
-          photoURL: currentUser.photoURL || "https://i.pravatar.cc/150?img=21"
-        }
-      ]);
-      setNewComment('');
+    if (newComment.trim() && currentUser && project) {
+      const commentObj = {
+        text: newComment.trim(),
+        author: currentUser.displayName || "User",
+        photoURL: currentUser.photoURL || "https://i.pravatar.cc/150?img=21",
+        timestamp: Date.now(),
+      };
+      try {
+        await addCommentToProject(project.id, commentObj);
+        setComments([commentObj, ...comments]); // Optimistic update
+        setNewComment('');
+      } catch (err) {
+        alert('Failed to post comment.');
+      }
     }
   };
 
