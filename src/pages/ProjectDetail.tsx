@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useLocation, Navigate, Link } from 'react-router-dom';
 import type { Project } from '../types';
 import './ProjectDetail.css';
-import { auth, sendInviteRequest, addCommentToProject } from '../firebase'; // Make sure export 'auth' from firebase.js
+import { auth, sendInviteRequest, addCommentToProject, getProjectLikes, likeProject, unlikeProject } from '../firebase';
 import { getFirestore, collection, query, where, getDocs, orderBy } from 'firebase/firestore';
 import { onAuthStateChanged } from "firebase/auth";
 import type { User } from "firebase/auth";
@@ -37,6 +37,15 @@ const ProjectDetail = () => {
   const [newComment, setNewComment] = useState('');
   const [likes, setLikes] = useState(0);
   const [liked, setLiked] = useState(false);
+  // Fetch likes on mount
+  React.useEffect(() => {
+    if (!project) return;
+    const fetchLikes = async () => {
+      const likeCount = await getProjectLikes(project.id);
+      setLikes(likeCount);
+    };
+    fetchLikes();
+  }, [project]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   // Listen for auth state changes
@@ -103,12 +112,15 @@ const ProjectDetail = () => {
               <div className="image-actions">
                 <button
                   className={`modern-like-button${liked ? ' liked' : ''}`}
-                  onClick={() => {
+                  onClick={async () => {
+                    if (!currentUser) return;
                     if (!liked) {
+                      await likeProject(project.id, currentUser.uid);
                       setLikes(likes + 1);
                       setLiked(true);
                     } else {
-                      setLikes(likes - 1);
+                      await unlikeProject(project.id, currentUser.uid);
+                      setLikes(Math.max(0, likes - 1));
                       setLiked(false);
                     }
                   }}

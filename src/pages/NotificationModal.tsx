@@ -1,6 +1,6 @@
-// Example: NotificationModal.tsx
+
 import React from 'react';
-import './NotificationModal.css'; // Ensure you have styles for the modal
+import './NotificationModal.css'; 
 
 interface Request {
   id: string;

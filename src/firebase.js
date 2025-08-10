@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore, collection, addDoc, getDocs, setDoc, doc } from "firebase/firestore";
+import { getFirestore, collection, addDoc, getDocs, setDoc, doc, getDoc, updateDoc, increment } from "firebase/firestore";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -49,6 +49,28 @@ export async function getData(collectionName) {
     console.error("Error getting documents: ", e);
     throw e;
   }
+}
+
+// Like functions
+export async function getProjectLikes(projectId) {
+  const docRef = doc(db, "Likes", projectId);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    return docSnap.data().count || 0;
+  } else {
+    return 0;
+  }
+}
+
+export async function likeProject(projectId, userId) {
+  const docRef = doc(db, "Likes", projectId);
+  // Optionally: prevent double-like by user (not implemented here)
+  await setDoc(docRef, { count: increment(1) }, { merge: true });
+}
+
+export async function unlikeProject(projectId, userId) {
+  const docRef = doc(db, "Likes", projectId);
+  await setDoc(docRef, { count: increment(-1) }, { merge: true });
 }
 
 // Sign in with Google popup and save user profile
