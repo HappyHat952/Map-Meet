@@ -196,7 +196,6 @@ function Home() {
                   <img src={project.image} alt={project.name} className="widget-image" />
                   <div className="widget-overlay">
                     <h3>{project.name}</h3>
-                    <p>{project.description}</p>
                   </div>
                 </>
               ) : (
